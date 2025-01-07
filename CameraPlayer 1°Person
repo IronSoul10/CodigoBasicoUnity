@@ -1,0 +1,85 @@
+
+public class CameraController : MonoBehaviour
+{
+    [Header("Camera Settings")]
+    [SerializeField] private Transform player; // Referencia al transform del jugador
+    [SerializeField] private float mouseSensitivity = 100f; // Sensibilidad del mouse para la rotación de la cámara
+    [SerializeField] private float smoothness = 0.1f; // Desfase para el movimiento suave de la cámara
+
+    private float minAngleY = -90f; // Rotación mínima en el eje vertical
+    private float maxAngleY = 90f; // Rotación máxima en el eje vertical
+
+    private Vector2 camVelocity; // Velocidad de la cámara
+    private Vector2 smoothVelocity; // Velocidad suavizada del movimiento del ratón
+
+    [Header("Camera Movement")]
+    [SerializeField] private bool moveHead = true; // Determina si se activa el movimiento de la cabeza
+    [SerializeField] private float walkingSpeed = 0.5f; // Velocidad de la cabeza al caminar
+    [SerializeField] private float runningSpeed = 1f; // Velocidad de la cabeza al correr
+    [SerializeField] private float amplitude = 0.02f; // Amplitud del movimiento de la cabeza
+    [SerializeField] private float frequency = 1.5f; // Frecuencia del movimiento de la cabeza
+    [SerializeField] private float resetPosSpeed = 5f; // Velocidad de regreso a la posición inicial
+
+    private Vector3 startPos; // Posición inicial de la cámara
+    [SerializeField] private PlayerMovement playerMovementScript; // Referencia al script de movimiento del jugador
+
+    private void Start()
+    {
+        startPos = transform.localPosition; // Almacena la posición inicial de la cámara
+        Cursor.lockState = CursorLockMode.Locked; // Bloquea el cursor en el centro de la pantalla
+        Cursor.visible = false; // Oculta el cursor
+    }
+
+    private void Update()
+    {
+        RotateCamera(); // Rota la cámara en cada frame
+
+        if (!moveHead) return; // Si no se debe mover la cabeza, retorna
+        HandleHeadMovement(); // Mueve la cabeza del jugador
+        ResetPosition(); // Resetea la posición de la cámara
+    }
+
+    private void RotateCamera()
+    {
+        Vector2 rawFrameVelocity = Vector2.Scale(MousePos(), Vector2.one * mouseSensitivity); // Calcula el movimiento del ratón ajustado por la sensibilidad
+        smoothVelocity = Vector2.Lerp(smoothVelocity, rawFrameVelocity, smoothness); // Suaviza el movimiento del ratón
+        camVelocity += smoothVelocity; // Almacena la velocidad de la cámara
+        camVelocity.y = Mathf.Clamp(camVelocity.y, minAngleY, maxAngleY); // Limita la rotación vertical
+
+        transform.localRotation = Quaternion.Euler(-camVelocity.y, 0f, 0f); // Rota la cámara en el eje X
+        player.localRotation = Quaternion.Euler(0f, camVelocity.x, 0f); // Rota el jugador en el eje Y
+    }
+
+    private Vector2 MousePos()
+    {
+        return new Vector2(Input.GetAxisRaw("Mouse X"), Input.GetAxisRaw("Mouse Y"));
+    }
+
+    private void HandleHeadMovement()
+    {
+        if (!playerMovementScript.IsMoving()) return; // Si el jugador no se está moviendo, retorna
+
+        if (playerMovementScript.IsMoving() && !playerMovementScript.IsRunning())
+        {
+            transform.localPosition += FootStepMotion(walkingSpeed); // Movimiento de caminar
+        }
+        else if (playerMovementScript.IsMoving() && playerMovementScript.IsRunning())
+        {
+            transform.localPosition += FootStepMotion(runningSpeed); // Movimiento de correr
+        }
+    }
+
+    private void ResetPosition()
+    {
+        if (transform.localPosition == startPos) return; // Si la cámara ya está en su posición inicial, retorna
+        transform.localPosition = Vector3.Lerp(transform.localPosition, startPos, resetPosSpeed * Time.deltaTime); // Suaviza el retorno a la posición inicial
+    }
+
+    private Vector3 FootStepMotion(float speed)
+    {
+        Vector3 pos = Vector3.zero;
+        pos.y = Mathf.Sin(Time.time * frequency) * amplitude * speed;
+        pos.x = Mathf.Cos(Time.time * frequency / 2) * amplitude * 2 * speed;
+        return pos;
+    }
+}

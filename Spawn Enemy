@@ -1,0 +1,65 @@
+using UnityEngine;
+
+public class SpawnEnemigos : MonoBehaviour
+{
+    // Referencia pública al prefab del enemigo
+    public GameObject enemigoPrefab;
+    
+    // Velocidad del enemigo (aunque no se usa en este código)
+    public float velEnemigo;
+    
+    // Bandera que controla si el spawn de enemigos está activo
+    bool spawnActivo = true;
+    
+    // Vector para almacenar la rotación del enemigo
+    private Vector3 rotacion;
+
+    void Update()
+    {
+        // Llama al método SpawnEnemigo en cada frame
+        SpawnEnemigo();
+    }
+
+    void SpawnEnemigo()
+    {
+        // Verifica si el spawn de enemigos está activo
+        if (spawnActivo)
+        {
+            // Genera una posición X aleatoria dentro del rango especificado
+            float posicionX = Random.Range(-600f, 600f);
+
+            // Define la posición de spawn del enemigo
+            Vector3 posicionSpawn = new Vector3(posicionX, 0, 500);
+
+            // Convierte el vector de rotación a Quaternion
+            Quaternion rotacionQuaternion = Quaternion.Euler(rotacion);
+
+            // Instancia el prefab del enemigo en la posición y rotación especificadas
+            GameObject clone = Instantiate(enemigoPrefab, posicionSpawn, rotacionQuaternion);
+
+            // Obtiene el componente Rigidbody del enemigo clonado
+            Rigidbody rb = clone.GetComponent<Rigidbody>();
+
+            // Aplica una fuerza hacia adelante al Rigidbody
+            rb.AddForce(Vector3.forward * 10f);
+
+            // Destruye el enemigo clonado después de 20 segundos
+            Destroy(clone, 20);
+
+            // Inicia la corutina ColdDown para controlar el tiempo de espera entre spawns
+            StartCoroutine(ColdDown());
+        }
+    }
+
+    IEnumerator ColdDown()
+    {
+        // Desactiva el spawn de enemigos
+        spawnActivo = false;
+
+        // Espera 1 segundo antes de reactivar el spawn de enemigos
+        yield return new WaitForSeconds(1f);
+
+        // Reactiva el spawn de enemigos
+        spawnActivo = true;
+    }
+}

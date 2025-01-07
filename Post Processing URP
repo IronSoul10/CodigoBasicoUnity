@@ -1,0 +1,120 @@
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+public class PostProcessingURP : MonoBehaviour
+{
+    public Volume globalVolume; // Referencia al volumen de postprocesado global
+    private Bloom bloom;
+    private ChannelMixer channelMixer;
+    private ChromaticAberration chromaticAberration;
+    private ColorAdjustments colorAdjustments;
+    private ColorLookup colorLookup;
+    private DepthOfField depthOfField;
+    private FilmGrain filmGrain;
+    private LensDistortion lensDistortion;
+    private LiftGammaGain liftGammaGain;
+    private MotionBlur motionBlur;
+    private PaniniProjection paniniProjection;
+    private ShadowsMidtonesHighlights shadowsMidtonesHighlights;
+    private SplitToning splitToning;
+
+    void Start()
+    {
+        Reference();
+    }
+    void Reference()
+    {
+        // Inicializar y obtener las referencias a los efectos de postprocesado
+        globalVolume.profile.TryGet(out bloom);
+        globalVolume.profile.TryGet(out channelMixer);
+        globalVolume.profile.TryGet(out chromaticAberration);
+        globalVolume.profile.TryGet(out colorAdjustments);
+        globalVolume.profile.TryGet(out colorLookup);
+        globalVolume.profile.TryGet(out depthOfField);
+        globalVolume.profile.TryGet(out filmGrain);
+        globalVolume.profile.TryGet(out lensDistortion);
+        globalVolume.profile.TryGet(out liftGammaGain);
+        globalVolume.profile.TryGet(out motionBlur);
+        globalVolume.profile.TryGet(out paniniProjection);
+        globalVolume.profile.TryGet(out shadowsMidtonesHighlights);
+        globalVolume.profile.TryGet(out splitToning);
+    }
+
+    // Bloom
+    public void SetBloomIntensity(float intensity)
+    {
+        if (bloom != null) bloom.intensity.value = intensity;
+    }
+
+    // Channel Mixer
+    public void SetChannelMixerRedOut(float redOut)
+    {
+        if (channelMixer != null) channelMixer.redOutRedIn.value = redOut;
+    }
+
+    // Chromatic Aberration
+    public void SetChromaticAberrationIntensity(float intensity)
+    {
+        if (chromaticAberration != null) chromaticAberration.intensity.value = intensity;
+    }
+
+    // Color Adjustments
+    public void SetColorAdjustmentsSaturation(float saturation)
+    {
+        if (colorAdjustments != null) colorAdjustments.saturation.value = saturation;
+    }
+
+    // Color Lookup
+    public void SetColorLookupTexture(Texture lutTexture)
+    {
+        if (colorLookup != null) colorLookup.texture.value = lutTexture;
+    }
+
+    // Depth Of Field
+    public void SetDepthOfFieldFocusDistance(float distance)
+    {
+        if (depthOfField != null) depthOfField.focusDistance.value = distance;
+    }
+
+    // Film Grain
+    public void SetFilmGrainIntensity(float intensity)
+    {
+        if (filmGrain != null) filmGrain.intensity.value = intensity;
+    }
+
+    // Lens Distortion
+    public void SetLensDistortionIntensity(float intensity)
+    {
+        if (lensDistortion != null) lensDistortion.intensity.value = intensity;
+    }
+
+    // Lift, Gamma, Gain
+    public void SetLift(Vector4 lift)
+    {
+        if (liftGammaGain != null) liftGammaGain.lift.value = lift;
+    }
+
+    // Motion Blur
+    public void SetMotionBlurIntensity(float intensity)
+    {
+        if (motionBlur != null) motionBlur.intensity.value = intensity;
+    }
+
+    // Panini Projection
+    public void SetPaniniProjectionDistance(float distance)
+    {
+        if (paniniProjection != null) paniniProjection.distance.value = distance;
+    }
+
+    // Shadows, Midtones, Highlights
+    public void SetShadowsMidtonesHighlightsShadows(Vector4 shadows)
+    {
+        if (shadowsMidtonesHighlights != null) shadowsMidtonesHighlights.shadows.value = shadows;
+    }
+
+    // Split Toning
+    public void SetSplitToningShadows(Color shadows)
+    {
+        if (splitToning != null) splitToning.shadows.value = shadows;
+    }
+}

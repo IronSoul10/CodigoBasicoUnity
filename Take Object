@@ -1,0 +1,44 @@
+using UnityEngine;
+
+public class TakeObject : MonoBehaviour
+{
+    public GameObject posicionObjeto;
+    public GameObject dejarObjeto;
+    private GameObject objetoEnMano = null;
+
+    private void Update()
+    {
+        Dejarbjeto();
+    }
+
+    void Dejarbjeto()
+    {
+        if (objetoEnMano != null)
+        {
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                objetoEnMano.GetComponent<Rigidbody>().useGravity = true; //6
+                objetoEnMano.GetComponent<Rigidbody>().isKinematic = false; //6
+                objetoEnMano.transform.SetParent(null); //7
+                objetoEnMano.transform.position = dejarObjeto.transform.position; //8
+                objetoEnMano = null;
+            }
+
+        }
+    }
+
+    //TOMAR OBJETO//
+    private void OnTriggerStay(Collider other) //1
+    {
+        if ( other.gameObject.CompareTag("Conector"))
+        {
+            if (Input.GetKeyDown(KeyCode.Mouse0) && objetoEnMano == null ) 
+            {
+                other.GetComponent<Rigidbody>().useGravity = false; //2
+                other.GetComponent <Rigidbody>().isKinematic = true; //2
+                other.transform.position = posicionObjeto.transform.position; //3
+                other.gameObject.transform.SetParent(posicionObjeto.transform); //4
+                objetoEnMano = other.gameObject; //5
+            }
+        }
+    }
